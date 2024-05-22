@@ -6,20 +6,18 @@ const Start = ({ navigation }) => {
   const colors = ['#090C08', '#474056', '#8A95A5', '#B9C6AE']; //colour choices for user
   const [background, setBackground] = useState(''); //state to handle setting background color as picked by user 
 
-  // const image = {src: '../assets/Background Image.png'};
  return (
    <View style={styles.container}>
       <ImageBackground source={require('../assets/Background-Image.png')} resizeMode='cover' style={styles.image}>
         <Text style={styles.appTitle} >Fuse.</Text>
-        <View style={styles.startOptionsContainer} >
-          <TextInput
+        <View style={styles.startOptionsContainer} > {/* container for all user options */}
+          <TextInput 
             style={styles.textInput}
             value={name}
             onChangeText={setName}
             placeholder='Type your username here'
           />
-
-          <View style={styles.colorChoiceContainer} >
+          <View style={styles.colorChoiceContainer} > {/* elements to choose bg color */}
             <Text style={styles.colorChoiceText} >Choose Background Color</Text>
             <View style={styles.colorButtonsContainer} >
               {colors.map((color, index) => ( //maps the colors array to a button
@@ -35,6 +33,7 @@ const Start = ({ navigation }) => {
               ))}
             </View>
           </View>
+          {/* button to enter chat */}
           <TouchableOpacity onPress={() => navigation.navigate('Chat', { name: name, background: background} )} style={styles.chatButton} >
             <Text style={styles.chatButtonText}>Start Chatting</Text>
           </TouchableOpacity>
@@ -64,7 +63,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     textAlign: "center",
     flex: 1,
-    margin: '25%'
+    margin: 10,
   },
   startOptionsContainer: {
     height: "50%",
