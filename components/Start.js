@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, ImageBackground, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, TextInput, ImageBackground, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 
 const Start = ({ navigation }) => {
   const [name, setName] = useState(''); //useState to handle the input of a user's name
@@ -10,14 +10,14 @@ const Start = ({ navigation }) => {
    <View style={styles.container}>
       <ImageBackground source={require('../assets/Background-Image.png')} resizeMode='cover' style={styles.image}>
         <Text style={styles.appTitle} >Fuse.</Text>
-        <View style={styles.startOptionsContainer} > {/* container for all user options */}
+        <View style={styles.startOptionsContainer} > 
           <TextInput 
             style={styles.textInput}
             value={name}
             onChangeText={setName}
             placeholder='Type your username here'
           />
-          <View style={styles.colorChoiceContainer} > {/* elements to choose bg color */}
+          <View style={styles.colorChoiceContainer} > 
             <Text style={styles.colorChoiceText} >Choose Background Color</Text>
             <View style={styles.colorButtonsContainer} >
               {colors.map((color, index) => ( //maps the colors array to a button
@@ -34,12 +34,18 @@ const Start = ({ navigation }) => {
             </View>
           </View>
           {/* button to enter chat */}
-          <TouchableOpacity onPress={() => navigation.navigate('Chat', { name: name, background: background} )} style={styles.chatButton} >
-            <Text style={styles.chatButtonText}>Start Chatting</Text>
+          <TouchableOpacity 
+            onPress={() => navigation.navigate('Chat', { name: name, background: background} )}
+            style={styles.chatButton}
+            accessible={true}
+            accessibilityLabel='Chat entrance'
+            accessibilityHint='Takes the user to chat room'
+            accessibilityRole='button'>
+              <Text style={styles.chatButtonText}>Start Chatting</Text>
           </TouchableOpacity>
         </View>
       </ImageBackground>
-      
+      { Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null }
    </View>
  );
 }
