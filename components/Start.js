@@ -1,10 +1,24 @@
 import { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, ImageBackground, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, View, Text, TextInput, ImageBackground, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { getAuth, signInAnonymously } from 'firebase/auth';
 
 const Start = ({ navigation }) => {
+  const auth = getAuth(); //initialize Firebase authentication handler
   const [name, setName] = useState(''); //useState to handle the input of a user's name
   const colors = ['#090C08', '#474056', '#8A95A5', '#B9C6AE']; //colour choices for user
   const [background, setBackground] = useState(''); //state to handle setting background color as picked by user 
+
+  //code to allow user to sign in anonymously
+  const signInUser = () => {
+    signInAnonymously(auth)
+    .then(result => {
+      navigation.navigate("Chat", {userID: result.user.uid, background: background, name: name }); //the user is now signed in, the app will go to "Chat" and pass user ID to it
+      Alert.alert("Signed in Successfully!")
+    })
+    .catch((error) => {
+      Alert.alert("Unable to sign in, try again later");
+    })
+  }
 
  return (
    <View style={styles.container}>
@@ -35,7 +49,7 @@ const Start = ({ navigation }) => {
           </View>
           {/* button to enter chat */}
           <TouchableOpacity 
-            onPress={() => navigation.navigate('Chat', { name: name, background: background} )}
+            onPress={signInUser}
             style={styles.chatButton}
             accessible={true}
             accessibilityLabel='Chat entrance'
