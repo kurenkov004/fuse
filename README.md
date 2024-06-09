@@ -21,3 +21,6 @@ This is a project created for the careerFoundry Full Stack Development Course. I
 - react-native-gifted-chat: ^2.4.0
 - react-native-screens: 3.31.1
 - react-native-safe-area-context: 4.10.1
+- react-native-async-storage/async-storage: 1.23.1
+- react-native-community/netinfo: "1.3.1
+    
