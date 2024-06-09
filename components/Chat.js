@@ -1,33 +1,59 @@
 import { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, KeyboardAvoidingView, Platform } from 'react-native';
-import { GiftedChat, Bubble } from 'react-native-gifted-chat';
+import { GiftedChat, Bubble, InputToolbar } from 'react-native-gifted-chat';
 import { collection, addDoc, onSnapshot, query, orderBy } from 'firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Chat = ({ route, navigation, db }) => {
+const Chat = ({ route, navigation, db, isConnected }) => {
   const { name, background, userID } = route.params; //extract props from navigation
   const [messages, setMessages] = useState([]); //state to handle new messages being set/ rendered
 
 
+  let unsubMessages;
+  
   //this is triggered right after the Chat component mounts
   useEffect(() => {
+    if (isConnected === true) {
+
+    // unregister current onSnapshot() listener to avoid registering multiple listeners when
+    // useEffect code is re-executed.
+    if (unsubMessages) unsubMessages();
+    unsubMessages = null;
+
     navigation.setOptions({ title: name }) // changes the title of the navbar to the name the user entered on Start screen
     const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
-    const unsubMessages = onSnapshot(q, (documentSnapshot) => {
+    unsubMessages = onSnapshot(q, (documentSnapshot) => {
       let newMessages = [];
-      documentSnapshot.forEach(doc => {
+      documentSnapshot.forEach(doc => { //doc stands for each document in the docSnapshot collection
         newMessages.push({
           id: doc.id,
-          ...doc.data(),
-          createdAt: new Date(doc.data().createdAt.toMillis())
+          ...doc.data(), 
+          createdAt: new Date(doc.data().createdAt.toMillis()) 
         })
       })
+      cacheMessages(newMessages);
       setMessages(newMessages);
-    })
+    });
+    } else loadCachedMessages();
+
     return () => {
       if (unsubMessages) unsubMessages();
     }
-  }, []);
+  }, [isConnected]);
 
+  const loadCachedMessages = async () => {
+    const cachedMessages = await AsyncStorage.getItem("Messages") || [];
+    setMessages(JSON.parse(cachedMessages));
+  }
+
+  const cacheMessages = async (messagesToCache) => {
+    try {
+      await AsyncStorage.setItem('messages', JSON.stringify(messagesToCache));
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+  
   //function to handle new messages, saves them to Firestore db by using addDoc()
   const onSend = (newMessages) => {
     addDoc(collection(db, "messages"), newMessages[0])
@@ -48,11 +74,19 @@ const Chat = ({ route, navigation, db }) => {
     />
   }
 
+  //function to override GiftedChat's InputToolbar in case user goes offline
+  const renderInputToolbar = (props) => {
+    if(isConnected)
+      return <InputToolbar {...props} />;
+    else return null;
+  }
+
  return (
    <View style={[styles.container, {backgroundColor: background}]}>
      <GiftedChat
       messages={messages}
       renderBubble={renderBubble}
+      renderInputToolbar={renderInputToolbar}
       onSend={messages => onSend(messages)}
       user={{
         _id: userID,
