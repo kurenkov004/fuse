@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, ImageBackground, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { getAuth, signInAnonymously } from 'firebase/auth';
 
+
 const Start = ({ navigation }) => {
   const auth = getAuth(); //initialize Firebase authentication handler
   const [name, setName] = useState(''); //useState to handle the input of a user's name
