@@ -1,10 +1,12 @@
+import CustomActions from './CustomActions';
 import { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, KeyboardAvoidingView, Platform } from 'react-native';
+import MapView from 'react-native-maps';
 import { GiftedChat, Bubble, InputToolbar } from 'react-native-gifted-chat';
 import { collection, addDoc, onSnapshot, query, orderBy } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Chat = ({ route, navigation, db, isConnected }) => {
+const Chat = ({ route, navigation, db, isConnected, storage }) => {
   const { name, background, userID } = route.params; //extract props from navigation
   const [messages, setMessages] = useState([]); //state to handle new messages being set/ rendered
 
@@ -81,13 +83,43 @@ const Chat = ({ route, navigation, db, isConnected }) => {
     else return null;
   }
 
+  //this creates the circle action button
+  const renderCustomActions = (props) => {
+    return <CustomActions {...props} storage={storage} userID={userID} />
+  }
+
+  //this checks if the currentMessage contains location data - if yes, it will return MapView
+  const renderCustomView = (props) => {
+    const { currentMessage} = props;
+    if (currentMessage.location) {
+      return (
+          <MapView
+            style={{width: 150,
+              height: 100,
+              borderRadius: 13,
+              margin: 3}}
+            region={{
+              latitude: currentMessage.location.latitude,
+              longitude: currentMessage.location.longitude,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
+            }}
+          />
+      );
+    }
+    return null;
+  }
+
+
  return (
    <View style={[styles.container, {backgroundColor: background}]}>
      <GiftedChat
       messages={messages}
       renderBubble={renderBubble}
       renderInputToolbar={renderInputToolbar}
+      renderActions={renderCustomActions}
       onSend={messages => onSend(messages)}
+      renderCustomView={renderCustomView}
       user={{
         _id: userID,
         name: name
