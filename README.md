@@ -41,9 +41,3 @@ This is a project created for the careerFoundry Full Stack Development Course. I
 - use "npx expo start" to start your development server and check it with the Expo Go
 - set up Firebase - follow prompt to create a new Firestore Database, make sure to set all rules to "allow read, write: if true;" remember to install Firebase using npm and follow Firebase documentation to initialise Firebase in your project file
 - Happy coding!
-
-=======
-- react-native-async-storage/async-storage: 1.23.1
-- react-native-community/netinfo: 1.3.1
-    
->>>>>>> 59e6f1eca454cc2f3fb94071ee4a61968e6e44cf
